@@ -1,0 +1,5 @@
+flask
+pypdf
+markitdown[pdf]
+markdown
+markdown-pdf

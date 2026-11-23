@@ -1,0 +1,6 @@
+{% extends "base.html" %} {% block body %}
+<div class="bg-white p-4 rounded shadow space-y-3">
+  <h2 class="text-xl font-bold">{{ tool.name }}</h2>
+  {% include "tools/" ~ tool.slug ~ ".html" %}
+</div>
+{% endblock %}
