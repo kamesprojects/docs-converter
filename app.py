@@ -39,6 +39,24 @@ def parse_ranges(text, total):
     return pages
 
 
+DOWNLOAD_NAMES = {
+    "merge": "merged.pdf",
+    "split": "split.pdf",
+    "markdown": "document.md",
+    "md_to_html": "documents.html",
+    "md_to_pdf": "documents.pdf",
+}
+
+
+@app.after_request
+def download(response):
+    """Save the result as a file when the form was sent with the Download button."""
+    name = DOWNLOAD_NAMES.get(request.endpoint)
+    if name and response.status_code == 200 and "download" in request.form:
+        response.headers.set("Content-Disposition", "attachment", filename=name)
+    return response
+
+
 def pdf_response(writer):
     out = io.BytesIO()
     writer.write(out)

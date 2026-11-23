@@ -12,11 +12,23 @@ Local Flask app for PDF and document conversion. Runs on `127.0.0.1` only.
 
 ## Commands
 
-```powershell
-conda activate my-python-env
+Requires Python 3.13. First run (Git Bash):
+
+```bash
+py -3.13 -m venv .venv
+source .venv/Scripts/activate
 pip install -r requirements.txt
 python app.py
 ```
+
+Next runs:
+
+```bash
+source .venv/Scripts/activate
+python app.py
+```
+
+In PowerShell, activate with `.\.venv\Scripts\Activate.ps1` instead.
 
 Open http://127.0.0.1:5000.
 
@@ -36,7 +48,7 @@ On a tool page the sidebar groups all tools by category (`pdf`, `html`, `md`). C
 
 Top right: **User Guide** opens this document, **Light / Dark** switches the theme and remembers it.
 
-Results of Merge PDF, Split PDF, PDF to Markdown and MD to HTML open in a new tab. Merge MD, Split MD and HTML to MD download a file. **Clear** resets a form.
+Results of Merge PDF, Split PDF, PDF to Markdown, MD to HTML and MD to PDF open in a new tab. Click **Download** instead to save the result as a file in the browser's download folder. Merge MD, Split MD and HTML to MD download a file. **Clear** resets a form.
 
 ### Merge PDF
 
