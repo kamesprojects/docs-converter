@@ -1,15 +1,7 @@
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-env/
-
-# Flask
-instance/
-.pytest_cache/
-.coverage
-htmlcov/
+# Node / Vite
+node_modules/
+dist/
+*.local
 
 # IDEs and editors
 .vscode/
@@ -19,7 +11,3 @@ htmlcov/
 # OS files
 .DS_Store
 Thumbs.db
-
-# Build and restore output
-project-code.md
-restored/
