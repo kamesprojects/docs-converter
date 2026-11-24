@@ -1,56 +1,37 @@
 # Commands
 
-Create the virtual environment (first time only, requires Python 3.13):
+Install dependencies:
 
 ```bash
-py -3.13 -m venv .venv
+npm install
 ```
 
-Activate the virtual environment in Git Bash:
+Run development server:
 
 ```bash
-source .venv/Scripts/activate
+npm run dev
 ```
 
-Or in PowerShell:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-Install the required Python packages:
+Run unit tests:
 
 ```bash
-pip install -r requirements.txt
+npm test
 ```
 
-Run the Flask application:
+Run TypeScript check:
 
 ```bash
-python app.py
+npm run typecheck
 ```
 
-Open your web browser and navigate to:
+Build production static bundle:
 
 ```bash
-http://127.0.0.1:5000
+npm run build
 ```
 
-Stop the application with `Ctrl+C`, then deactivate the virtual environment:
+Preview production build:
 
 ```bash
-deactivate
-```
-
-Build all project files into `project-code.md`:
-
-```bash
-python build_code.py build
-```
-
-Restore the files from `project-code.md` into the `restored` folder (or another folder):
-
-```bash
-python build_code.py unbuild
-python build_code.py unbuild some_folder
+npm run preview
 ```

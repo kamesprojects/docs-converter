@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; font-src 'self'; object-src 'self' blob:;"
+    />
+    <title>PDF App</title>
+    <script>
+      (function() {
+        const root = document.documentElement;
+        const dark = localStorage.theme
+          ? localStorage.theme === "dark"
+          : matchMedia("(prefers-color-scheme: dark)").matches;
+        root.classList.toggle("dark", dark);
+      })();
+    </script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex">
+    <button
+      id="theme-toggle-btn"
+      class="fixed top-3 right-3 bg-gray-300 px-3 py-1 rounded"
+    >
+      Light / Dark
+    </button>
+    <a
+      href="/guide"
+      title="User guide"
+      class="fixed top-3 right-32 bg-gray-300 px-3 py-1 rounded"
+      >User Guide</a
+    >
+    <div id="app" class="w-full min-h-screen flex"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

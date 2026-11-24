@@ -1,44 +1,95 @@
 # PDF App
 
-Local Flask app for PDF and document conversion. Runs on `127.0.0.1` only.
+Pure client-side static web application for PDF and document conversion. All processing runs entirely inside the user's browser in Web Workers. Files never leave the computer.
+
+## Security & Architecture
+
+- **Zero-knowledge**: Processing happens locally in the browser memory using Web Workers.
+- **Strict Content Security Policy (CSP)**: Technical enforcement via `<meta http-equiv="Content-Security-Policy" content="connect-src 'none'; ...">`. All network requests (`fetch`, `XMLHttpRequest`, `WebSocket`) are blocked by the browser.
+- **No CDN dependencies**: All libraries and styles (Tailwind CSS) are bundled locally.
+- **No backend**: Output consists of pure static files (HTML, CSS, JS) deployable to any static hosting service.
 
 ## Tech stack
 
-- Flask: web framework
-- pypdf: merge and split PDFs
-- MarkItDown: PDF/HTML to Markdown
-- Markdown: Markdown to HTML
-- BeautifulSoup: HTML parsing
+- **Vite**: Build tool and bundler
+- **TypeScript**: Strict type system (`strict: true`, no `any`)
+- **Tailwind CSS**: Utility-first styles bundled offline
+- **pdf-lib**: In-memory PDF merging and splitting
+- **pdfjs-dist**: Client-side text extraction from PDFs
+- **JSZip**: In-memory ZIP archive generation
+- **marked** + **DOMPurify**: Markdown to sanitized HTML
+- **Turndown**: HTML to Markdown conversion
+- **Vitest**: Unit testing framework
 
 ## Commands
 
-Requires Python 3.13. First run (Git Bash):
+Requires Node.js 18+.
+
+### Development
+
+Install dependencies:
 
 ```bash
-py -3.13 -m venv .venv
-source .venv/Scripts/activate
-pip install -r requirements.txt
-python app.py
+npm install
 ```
 
-Next runs:
+Start the development server:
 
 ```bash
-source .venv/Scripts/activate
-python app.py
+npm run dev
 ```
 
-In PowerShell, activate with `.\.venv\Scripts\Activate.ps1` instead.
+Open `http://localhost:5173`.
 
-Open http://127.0.0.1:5000.
+### Tests & Typecheck
 
-## Project files
+Run unit tests:
 
-- `app.py`: routes and tool list (`TOOLS`)
-- `template.html`: page template used by MD to HTML. Keep it next to `app.py`.
-- `templates/`: Flask pages. One file per tool in `templates/tools/`.
+```bash
+npm test
+```
 
-To add a tool, add an entry to `TOOLS`, create `templates/tools/<slug>.html` and add a route.
+Run TypeScript verification:
+
+```bash
+npm run typecheck
+```
+
+### Build
+
+Create an optimized production build in `dist/`:
+
+```bash
+npm run build
+```
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+### Deployment
+
+Deploy the contents of the `dist/` directory to any static web hosting:
+- **GitHub Pages / GitLab Pages**
+- **Cloudflare Pages**
+- **Netlify / Vercel**
+- **Nginx / Apache / AWS S3**
+
+No server-side runtime, database, or API backend is required.
+
+## Project structure
+
+```text
+src/
+  core/      Pure business logic functions (Uint8Array/string in -> out, fully testable)
+  io/        File API readers, download handlers, object URL lifecycle management
+  ui/        DOM event handlers, tool forms, routing, error displays, theme toggle
+  workers/   Heavy PDF operations offloaded to Web Workers
+  main.ts    Application bootstrap
+tests/       Vitest unit tests for core modules
+```
 
 ## User guide
 
@@ -46,9 +97,9 @@ The home page lists all tools. Filter them by `pdf`, `md` or `html`, then click 
 
 On a tool page the sidebar groups all tools by category (`pdf`, `html`, `md`). Click a category name to collapse or expand it. A tool with several tags appears in each category. The search box filters the tools by name.
 
-Top right: **User Guide** opens this document, **Light / Dark** switches the theme and remembers it.
+Top right: **User Guide** opens this document, **Light / Dark** switches the theme and remembers it in `localStorage`.
 
-Results of Merge PDF, Split PDF, PDF to Markdown, MD to HTML and MD to PDF open in a new tab. Click **Download** instead to save the result as a file in the browser's download folder. Merge MD, Split MD and HTML to MD download a file. **Clear** resets a form.
+Results of Merge PDF, Split PDF, PDF to Markdown, and MD to HTML open in a new tab. Click **Download** instead to save the result directly to your downloads folder. Merge MD, Split MD and HTML to MD download a file. **Clear** resets a form.
 
 ### Merge PDF
 
@@ -64,14 +115,14 @@ Results of Merge PDF, Split PDF, PDF to Markdown, MD to HTML and MD to PDF open 
 2. Enter page ranges, e.g. `3-5, 8-10` or `4`. Pages are 1-based.
 3. Click **Split**. One PDF with the selected pages, in the given order, opens in a new tab.
 
-An out-of-range value returns an error.
+An out-of-range value returns an error displayed in the UI.
 
 ### PDF to Markdown
 
 1. Pick one PDF.
 2. Click **Convert**. The Markdown text opens in a new tab.
 
-Only text PDFs work. Scanned PDFs without OCR return nothing.
+Only text PDFs work. Scanned PDFs without OCR return empty text.
 
 ### MD to HTML
 
@@ -79,12 +130,10 @@ Only text PDFs work. Scanned PDFs without OCR return nothing.
 2. Pick one or more `.md` files.
 3. Click **Convert**. One HTML page opens in a new tab, built from `template.html`. Each file becomes a section with a link in the navigation.
 
-Save it with Ctrl+S.
-
 ### HTML to MD
 
-1. Pick an HTML file generated by MD to HTML (the original file, not a page saved from the browser).
-2. Click **Convert**. A ZIP downloads with one `.md` file per section, e.g. `01_name.md`.
+1. Pick an HTML file generated by MD to HTML.
+2. Click **Convert (ZIP)**. A ZIP downloads with one `.md` file per section, e.g. `01_name.md`.
 
 An HTML file without sections is converted to a single `.md`.
 
@@ -96,11 +145,11 @@ An HTML file without sections is converted to a single `.md`.
 ### Split MD
 
 1. Pick one `.md` file.
-2. Click **Split**. A ZIP downloads with one `.md` file per top-level `# title`, e.g. `01_title.md`.
+2. Click **Split (ZIP)**. A ZIP downloads with one `.md` file per top-level `# title`, e.g. `01_title.md`.
 
 Text before the first `# title` is dropped. `#` lines inside code blocks are ignored.
 
 ### MD to PDF
 
 1. Pick one or more `.md` files.
-2. Click **Convert**. One PDF opens in a new tab. Each file starts on a new page.
+2. Click **Convert** or **Download**. Opens the formatted document and prompts the native print-to-PDF dialog (`window.print()`). Each file starts on a new page.
