@@ -11,7 +11,7 @@ describe('secureFilename', () => {
   });
 
   it('normalizes diacritics', () => {
-    expect(secureFilename('príručka používateľa.md')).toBe('prirucka_pouzivatela.md');
+    expect(secureFilename('café résumé naïve.md')).toBe('cafe_resume_naive.md');
   });
 
   it('strips leading and trailing dots and underscores', () => {

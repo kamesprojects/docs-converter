@@ -1,6 +1,23 @@
 import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+
+// In a real browser, point to the locally bundled worker asset.
+// In test environments (jsdom / Node), leave empty so PDF.js falls back to in-process parsing.
+const isRealBrowser =
+  typeof window !== 'undefined' &&
+  typeof navigator !== 'undefined' &&
+  !navigator.userAgent.includes('jsdom') &&
+  !navigator.userAgent.includes('Node.js');
+
+if (isRealBrowser) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+}
 
 export async function extractTextFromPdf(pdfBytes: Uint8Array): Promise<string> {
+  if (isRealBrowser && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+  }
+
   const loadingTask = pdfjsLib.getDocument({
     data: pdfBytes,
     isEvalSupported: false,

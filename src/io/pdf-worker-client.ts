@@ -1,4 +1,5 @@
 import type { WorkerRequest, WorkerResponse } from '../workers/pdf.worker';
+import { extractTextFromPdf } from '../core/pdf-text';
 
 class PdfWorkerClient {
   private worker: Worker | null = null;
@@ -69,14 +70,12 @@ class PdfWorkerClient {
   }
 
   public async getPageCount(file: Uint8Array): Promise<number> {
-    // Clone buffer so original is not detached
     const copy = new Uint8Array(file);
     return await this.send<number>({ type: 'pageCount', file: copy }, [copy.buffer]);
   }
 
   public async extractText(file: Uint8Array): Promise<string> {
-    const copy = new Uint8Array(file);
-    return await this.send<string>({ type: 'extractText', file: copy }, [copy.buffer]);
+    return await extractTextFromPdf(file);
   }
 }
 

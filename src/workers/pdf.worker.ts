@@ -1,9 +1,8 @@
 import { mergePdf, splitPdf, getPdfPageCount } from '../core/pdf';
-import { extractTextFromPdf } from '../core/pdf-text';
 
 export interface WorkerRequest {
   id: number;
-  type: 'merge' | 'split' | 'pageCount' | 'extractText';
+  type: 'merge' | 'split' | 'pageCount';
   files?: Uint8Array[];
   file?: Uint8Array;
   pageIndices?: number[];
@@ -12,7 +11,7 @@ export interface WorkerRequest {
 export interface WorkerResponse {
   id: number;
   success: boolean;
-  data?: Uint8Array | number | string;
+  data?: Uint8Array | number;
   error?: string;
 }
 
@@ -47,14 +46,6 @@ workerContext.onmessage = async (event: MessageEvent<WorkerRequest>) => {
         if (!req.file) throw new Error('Missing file for page count');
         const count = await getPdfPageCount(req.file);
         const res: WorkerResponse = { id: req.id, success: true, data: count };
-        workerContext.postMessage(res);
-        break;
-      }
-
-      case 'extractText': {
-        if (!req.file) throw new Error('Missing file for text extraction');
-        const text = await extractTextFromPdf(req.file);
-        const res: WorkerResponse = { id: req.id, success: true, data: text };
         workerContext.postMessage(res);
         break;
       }
